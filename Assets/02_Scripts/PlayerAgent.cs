@@ -48,6 +48,7 @@ public class PlayerAgent : Agent
         rb.mass = 10.0f;
         rb.constraints = RigidbodyConstraints.FreezePositionY
                         | RigidbodyConstraints.FreezeRotationX
+                        | RigidbodyConstraints.FreezeRotationY
                         | RigidbodyConstraints.FreezeRotationZ;
 
         rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
@@ -100,7 +101,34 @@ public class PlayerAgent : Agent
     public override void OnActionReceived(ActionBuffers actions)
     {
         var action = actions.DiscreteActions;
-        Debug.Log($"[0] = {action[0]}, [1] = {action[1]}, [2] = {action[2]}");
+        // Debug.Log($"[0] = {action[0]}, [1] = {action[1]}, [2] = {action[2]}");
+
+        Vector3 dir = Vector3.zero;
+        Vector3 rot = Vector3.zero;
+        int forward = action[0];
+        int right = action[1];
+        int rotate = action[2];
+
+        switch(forward)
+        {
+            case 1 : dir = transform.forward; break;
+            case 2 : dir = -transform.forward; break;
+        }
+
+        switch(right)
+        {
+            case 1 : dir = -transform.right; break;
+            case 2 : dir = transform.right; break;
+        }
+
+        switch(rotate)
+        {
+            case 1 : rot = -transform.up; break;
+            case 2 : rot = transform.up; break;
+        }
+
+        transform.Rotate(rot, Time.fixedDeltaTime * 100f);
+        rb.AddForce(dir * 1.2f, ForceMode.VelocityChange);
     }
 
     public override void CollectObservations(VectorSensor sensor)
