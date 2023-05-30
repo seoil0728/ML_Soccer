@@ -131,16 +131,20 @@ public class PlayerAgent : Agent
         rb.AddForce(dir * 1.2f, ForceMode.VelocityChange);
     }
 
-    public override void CollectObservations(VectorSensor sensor)
-    {
-        base.CollectObservations(sensor);
-    }
 
-    public override void WriteDiscreteActionMask(IDiscreteActionMask actionMask)
+    private void OnCollisionEnter(Collision other) 
     {
-        base.WriteDiscreteActionMask(actionMask);
-    }
+        if (other.collider.CompareTag("ball"))
+        {
+            // Ball 터치 시 + 리워드
+            AddReward(0.2f);
 
+            // Kick 방향 계산
+            Vector3 kickDir = other.GetContact(0).point - transform.position;
+            other.gameObject.GetComponent<Rigidbody>().AddForce(kickDir.normalized * 1500f);
+
+        }
+    }
 
     
 }
